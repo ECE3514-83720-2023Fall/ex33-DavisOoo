@@ -116,14 +116,27 @@ void HashDictionary<KeyType, ValueType, HashType>::add(const KeyType &key,
     // TODO implement the add method...
     
     // 1. hash the key
-    
-    
+    std::size_t index = m_hash(key) % m_capacity;
+
     // 2. do linear probing
+    std::size_t numprobes = 0;
+    while (m_data[index].filled && (numprobes < m_capacity)) {
+        if (m_data[index].key == key) {
+            break;
+        }
+        index = (index + 1) % m_capacity;
+        numprobes += 1;
+    }
     
     // 3. Check to see if linear probing has failed
-    
+    if (numprobes == m_capacity) {
+        throw std::bad_alloc("Directory full");
+    }
     // 4. insert the key-value pair
-   
+    m_data[index].value = value;
+    m_data[index].key = key;
+    m_data[index].filled = true;
+    m_size = m_size + 1;
     // 5. test if we need to reallocate¡¡and reallocate if needed
     
       
@@ -134,6 +147,23 @@ template <typename KeyType, typename ValueType, typename HashType>
 void HashDictionary<KeyType, ValueType, HashType>::remove(const KeyType &key) {
     
     //TODO implement the remove method...
+    if (isempty()) {
+        throw std::logic_error("Directory is Empty");
+    }
+    std::size_t index = m_hash(key) % m_capacity;
+
+    // do linear probing
+    std::size_t numprobes = 0;
+    while (m_data[index].filled && (numprobes < m_capacity)) {
+        if (m_data[index].key == key) {
+            m_data[index].filled = false;
+            m_size = m_size - 1;
+            break;
+        }
+        index = (index + 1) % m_capacity;
+        numprobes += 1;
+    }
+
 }
 
 template <typename KeyType, typename ValueType, typename HashType>
