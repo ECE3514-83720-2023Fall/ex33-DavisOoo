@@ -130,7 +130,7 @@ void HashDictionary<KeyType, ValueType, HashType>::add(const KeyType &key,
     
     // 3. Check to see if linear probing has failed
     if (numprobes == m_capacity) {
-        throw std::logic_error(""Too many probes in HashDictionary::add");
+        throw std::logic_error("Too many probes in HashDictionary::add");
     }
 
     // 4. test if we need to reallocate¡¡and reallocate if needed
