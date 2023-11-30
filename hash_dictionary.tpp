@@ -133,7 +133,7 @@ void HashDictionary<KeyType, ValueType, HashType>::add(const KeyType &key,
         throw std::bad_alloc("Directory full");
     }
 
-    // 4. test if we need to reallocate¡¡and reallocate if needed
+    // 4. test if we need to reallocateÂ¡Â¡and reallocate if needed
     if (m_load_factor * m_capacity < m_size) {
         std::size_t newcapacity = 2 * m_capacity;
 
@@ -149,7 +149,7 @@ void HashDictionary<KeyType, ValueType, HashType>::add(const KeyType &key,
                 // do linear probing
                 std::size_t numprobes = 0;
                 while (temp[newindex].filled && (numprobes < newcapacity)) {
-                    newindex = (newindex + 1) % newcap;
+                    newindex = (newindex + 1) % newcapacity;
                     numprobes += 1;
                 }
                 temp[newindex].filled = true;
