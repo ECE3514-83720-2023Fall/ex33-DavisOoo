@@ -122,7 +122,7 @@ void HashDictionary<KeyType, ValueType, HashType>::add(const KeyType &key,
     std::size_t numprobes = 0;
     while (m_data[index].filled && (numprobes < m_capacity)) {
         if (m_data[index].key == key) {
-            break;
+            throw std::logic_error("Duplicate key in HashDictionary::add");
         }
         index = (index + 1) % m_capacity;
         numprobes += 1;
@@ -130,7 +130,7 @@ void HashDictionary<KeyType, ValueType, HashType>::add(const KeyType &key,
     
     // 3. Check to see if linear probing has failed
     if (numprobes == m_capacity) {
-        throw std::bad_alloc("Directory full");
+        throw std::logic_error(""Too many probes in HashDictionary::add");
     }
 
     // 4. test if we need to reallocate¡¡and reallocate if needed
