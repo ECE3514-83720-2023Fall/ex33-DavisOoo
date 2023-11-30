@@ -132,37 +132,72 @@ void HashDictionary<KeyType, ValueType, HashType>::add(const KeyType &key,
     if (numprobes == m_capacity) {
         throw std::bad_alloc("Directory full");
     }
-    // 4. insert the key-value pair
+
+    // 4. test if we need to reallocate¡¡and reallocate if needed
+    if (m_load_factor * m_capacity < m_size) {
+        std::size_t newcapacity = 2 * m_capacity;
+
+        while (!isprime(newcapacity)) {
+            newcapacity = newcapacity + 1;
+        }
+
+        KeyValueType* temp = new KeyValueType[newcapacity];
+        for (std::size_t i = 0; i < m_capacity; ++i) {
+            if (m_data[i].filled) {
+                // hash into new array
+                std::size_t newindex = m_hash(m_data[i].key) % newcapacity;
+                // do linear probing
+                std::size_t numprobes = 0;
+                while (temp[newindex].filled && (numprobes < newcapacity)) {
+                    newindex = (newindex + 1) % newcap;
+                    numprobes += 1;
+                }
+                temp[newindex].filled = true;
+                temp[newindex].key = m_data[i].key;
+                temp[newindex].value = m_data[i].value;
+            }
+        }
+
+        // cleanup
+        delete[] m_data;
+        m_data = temp;
+        m_capacity = newcapacity;
+
+    }
+      
+    // 5. insert the key-value pair
     m_data[index].value = value;
     m_data[index].key = key;
     m_data[index].filled = true;
     m_size = m_size + 1;
-    // 5. test if we need to reallocate¡¡and reallocate if needed
-    
-      
-
 }
 
 template <typename KeyType, typename ValueType, typename HashType>
 void HashDictionary<KeyType, ValueType, HashType>::remove(const KeyType &key) {
     
     //TODO implement the remove method...
-    if (isempty()) {
-        throw std::logic_error("Directory is Empty");
-    }
+
     std::size_t index = m_hash(key) % m_capacity;
 
     // do linear probing
     std::size_t numprobes = 0;
     while (m_data[index].filled && (numprobes < m_capacity)) {
         if (m_data[index].key == key) {
-            m_data[index].filled = false;
-            m_size = m_size - 1;
+
             break;
         }
         index = (index + 1) % m_capacity;
         numprobes += 1;
     }
+    if (numprobes == m_capacity) {
+        throw std::logic_error("Too many probes in HashDictionary::remove");
+    }
+
+    if (m_data[index].key != key) {
+        throw std::logic_error("Nonexistant key in HashDictionary::remove");
+    }
+    m_data[index].filled = false;
+    m_size = m_size - 1;
 
 }
 
